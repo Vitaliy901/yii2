@@ -42,16 +42,17 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'enableStrictParsing' => false,
             'rules' => [
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'review'],
             ],
         ],
-        */
     ],
     'params' => $params,
+
 ];
 
 if (YII_ENV_DEV) {

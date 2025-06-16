@@ -2,34 +2,36 @@
 
 namespace app\controllers;
 
-use app\models\Review;
-use yii\web\Controller;
+use Yii;
+use yii\rest\ActiveController;
+use yii\filters\Cors;
+use yii\web\Response;
 
-class ReviewController extends Controller
+
+class ReviewController extends ActiveController
 {
-    /**
-     * Displays homepage.
-     *
-     * @return string
-     */
+    public $modelClass = 'app\models\Review';
+
     public function actionIndex()
     {
-        $query = Review::find();
+        return $this->render('index');
+    }
 
-        $pagination = new Pagination([
-            'defaultPageSize' => 5,
-            'totalCount' => $query->count(),
-        ]);
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['corsFilter'] = [
+            'class' => Cors::class,
+            'cors' => [
+                'Origin' => ['http://localhost:8080'],
+                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+                'Access-Control-Allow-Credentials' => true,
+            ],
+        ];
+        Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $countries = $query->orderBy('name')
-            ->offset($pagination->offset)
-            ->limit($pagination->limit)
-            ->all();
+        return $behaviors;
 
-        return $this->render('index', [
-            'reviews' => $countries,
-            'pagination' => $pagination,
-        ]);
     }
 
 }
