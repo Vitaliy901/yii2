@@ -117,7 +117,10 @@ docker exec -it yii2-basic php yii migrate/up
 ### Starting the containers
 
 ~~~
-docker-compose up -d --build
+docker compose up -d --build
+~~~
+~~~
+docker container ls
 ~~~
 
 You can then access the application through the following URL:
