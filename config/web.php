@@ -47,7 +47,9 @@ $config = [
             'showScriptName' => false,
             'enableStrictParsing' => false,
             'rules' => [
-                ['class' => 'yii\rest\UrlRule', 'controller' => 'review'],
+                'POST api/review' => 'review/create',
+                'GET api/review' => 'review/index',
+                'PUT api/review/<id:\d+>' => 'review/update',
             ],
         ],
     ],
