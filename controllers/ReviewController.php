@@ -2,86 +2,82 @@
 
 namespace app\controllers;
 
-use Yii;
-use yii\rest\Controller;
-use yii\filters\auth\HttpBearerAuth;
-use yii\filters\AccessControl;
-use yii\filters\Cors;
 use app\models\Review;
+use yii\rest\ActiveController;
+use yii\filters\auth\HttpBearerAuth;
+use yii\filters\Cors;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
-
-
-class ReviewController extends Controller
+class ReviewController extends ActiveController
 {
+    public $modelClass = 'app\models\Review';
+
+    public function authenticate($token, $authMethod)
+    {
+        if ($token !== 'admin-token') {
+            throw new UnauthorizedHttpException("Invalid token.");
+        }
+        return true;
+    }
+
     public function behaviors()
     {
         $behaviors = parent::behaviors();
+
+        // CORS fore more detailed HTTP configuration
+        $behaviors['corsFilter'] = [
+            'class' => Cors::class,
+        ];
 
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::class,
             'only' => ['update'],
         ];
 
-        $behaviors['access'] = [
-            'class' => AccessControl::class,
-            'only' => ['update'],
-            'rules' => [
-                [
-                    'allow' => true,
-                    'roles' => ['@'],
-                    'matchCallback' => function () {
-                        return Yii::$app->request->headers->get('Authorization') === 'Bearer admin-token';
-                    },
-                ],
-            ],
-        ];
-
-        $behaviors['corsFilter'] = [
-            'class' => Cors::class,
-        ];
-
         return $behaviors;
     }
 
-    public function actionCreate()
+    public function actions()
     {
-        $review = new Review();
-        $review->load(Yii::$app->request->post(), '');
-        $review->status = Review::STATUS_PENDING;
-        if ($review->save()) {
-            return $review;
+        $actions = parent::actions();
+        unset($actions['update']);
+        return $actions;
+    }
+
+    public function actionUpdate($id)
+    {
+        $model = Review::findOne($id);
+        if (!$model) {
+            throw new NotFoundHttpException("Review not found.");
         }
-        return $review->errors;
+
+        $status = \Yii::$app->request->post('status');
+        if (!in_array($status, [Review::STATUS_APPROVED, Review::STATUS_REJECTED])) {
+            throw new ForbiddenHttpException("Invalid status.");
+        }
+
+        $model->status = $status;
+        return $model->save() ? $model : $model->getErrors();
     }
 
     public function actionIndex($status = null)
     {
         $query = Review::find();
-        if ($status) {
-            $query->andWhere(['status' => $status]);
+
+        if ($status !== null) {
+            $query->where(['status' => $status]);
         }
+
         return $query->orderBy(['created_at' => SORT_DESC])->all();
     }
 
-    public function actionUpdate($id)
+    public function actionCreate()
     {
-        $review = Review::findOne($id);
-        if (!$review) {
-            throw new NotFoundHttpException();
-        }
-        $data = Yii::$app->request->bodyParams;
-        if (isset($data['status']) && in_array($data['status'], [Review::STATUS_APPROVED, Review::STATUS_REJECTED])) {
-            $review->status = $data['status'];
-            if ($review->save()) {
-                return $review;
-            }
-        }
-        return ['error' => 'Invalid data'];
-    }
+        $model = new Review();
+        $model->load(\Yii::$app->request->post(), '');
+        $model->status = Review::STATUS_PENDING;
 
-    public function actionAdmin()
-    {
-        return $this->render('admin');
+        return $model->save() ? $model : $model->getErrors();
     }
 }
