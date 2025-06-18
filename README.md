@@ -85,6 +85,12 @@ Check that the installation was successful
 node -v
 npm -v
 ~~~
+Then, go to the vue-frontend folder and install npm
+~~~
+cd vue-frontend
+npm install
+npm run dev
+~~~
 
 ### Environment
 
