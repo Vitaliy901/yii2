@@ -51,7 +51,7 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({author_name: this.name, text: this.text})
                 });
-                this.message = 'Thanks, review was sent for moderation.';
+                this.message = 'Thanks, your review was sent for moderation.';
                 this.name = '';
                 this.text = '';
             },

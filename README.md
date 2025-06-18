@@ -40,10 +40,10 @@ REQUIREMENTS
 The minimum requirement by this project template that your Web server supports PHP 8.2.
 
 
-INSTALLATION
+INSTALLATION 
 ------------
 
-### Install via Composer
+### Install via Composer 
 
 If you do not have [Composer](https://getcomposer.org/), you should to install using below commands:
 
@@ -71,6 +71,19 @@ Installing **vendor** packages
 
 ~~~
 composer install
+~~~
+
+### Installation Node.js and npm
+
+~~~
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+~~~
+
+Check that the installation was successful
+~~~
+node -v
+npm -v
 ~~~
 
 ### Environment
