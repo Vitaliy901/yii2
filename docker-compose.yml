@@ -60,6 +60,18 @@ services:
       timeout: 5s
       retries: 5
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: yii2_phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    networks:
+      - appnet
+    ports:
+      - "8081:80"  # http://localhost:8081
 
 networks:
   appnet:
